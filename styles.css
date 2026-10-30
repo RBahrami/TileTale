@@ -15,6 +15,7 @@
   --letterbox: #eef1f6;  /* tile background while the image loads */
   --recessed: #dfe5ee;   /* the hole where the missing tile would be */
   --danger: #d92d20;
+  --success: #12805c;   /* completion heading */
   --gap: 6px;            /* space between tiles (read by app.js)     */
   --radius: 16px;
   --tile-radius: 10px;
@@ -299,56 +300,87 @@ body {
 }
 
 /* --------------------------------------------------------------------------
-   Completion modal
+   Completion: solved-picture reveal + result panel
    -------------------------------------------------------------------------- */
 
-.modal {
-  position: fixed;
+/* Fades in over the board the moment the puzzle is solved. It covers the
+   empty cell and seals the gaps between tiles, so the complete picture is
+   displayed and stays fully visible while the result appears below it. */
+.board-reveal {
+  position: absolute;
   inset: 0;
-  z-index: 50;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  background: rgba(15, 23, 42, 0.55);
-  animation: fade-in 0.18s ease;
+  z-index: 1;
+  border-radius: inherit;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.7s ease;
 }
 
-.modal[hidden] { display: none !important; }
+.board.solved .board-reveal { opacity: 1; }
 
-.modal-card {
+/* The result: an inline panel directly below the board — it never covers
+   the solved picture. */
+.result-panel {
   width: 100%;
-  max-width: 360px;
+  max-width: 440px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
-  padding: 30px 24px;
+  padding: 22px 24px 24px;
   background: var(--surface);
-  border-radius: 20px;
-  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
   text-align: center;
-  animation: pop-in 0.18s ease;
+  animation: pop-in 0.25s ease;
 }
 
-.modal-message {
+.result-panel[hidden] { display: none !important; }
+
+.result-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.result-check {
+  width: 22px;
+  height: 22px;
+  color: var(--success);
+  flex: none;
+}
+
+.result-title {
   margin: 0;
   font-size: 17px;
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--success);
+}
+
+.result-label {
+  margin: 14px 0 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   color: var(--muted);
 }
 
-.modal-answer {
-  margin: 0;
+.result-answer {
+  margin: 4px 0 0;
   font-size: clamp(24px, 7vw, 32px);
   font-weight: 800;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   color: var(--accent);
-  line-height: 1.35;
+  line-height: 1.3;
   overflow-wrap: anywhere;
 }
 
-@keyframes fade-in { from { opacity: 0; } }
+.result-panel .btn {
+  margin-top: 16px;
+}
 
 @keyframes pop-in {
   from { opacity: 0; transform: scale(0.94) translateY(6px); }

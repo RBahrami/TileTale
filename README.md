@@ -1,8 +1,10 @@
 # Sliding Puzzle
 
 A small, self-contained sliding-puzzle game for the browser. Four puzzles,
-each unlocked with a four-letter password; solving a puzzle reveals that
-game's predefined answer (for example a Greek letter).
+each unlocked with a four-letter password. When a puzzle is solved, the
+board fills in the missing piece so the complete picture stays visible,
+and that game's predefined answer (for example a Greek letter) appears in
+a result panel directly below the image.
 
 - Plain HTML + CSS + vanilla JavaScript. No backend, no database, no build
   step, no runtime dependencies, no external APIs.
@@ -19,7 +21,7 @@ game's predefined answer (for example a Greek letter).
 
 ```text
 /
-├── index.html          # markup for the three screens + completion modal
+├── index.html          # markup for the three screens + result panel
 ├── config.js           # ALL game customization lives here
 ├── puzzle.js           # pure game logic (shuffle, moves, solvability)
 ├── app.js              # UI layer (screens, input, rendering)
@@ -90,8 +92,22 @@ Edit the `password` field of a game in `config.js`. Rules:
 
 Edit the `answer` field in `config.js`. Any text is allowed — for example a
 Greek letter (`Π`, `Η`, `Φ`) or a longer label such as `Maze 1 - Start: Π`.
-It is displayed exactly as written in the completion dialog — and only after
-the puzzle is solved.
+It is displayed exactly as written in the result panel below the completed
+picture — and only after the puzzle is solved.
+
+### What happens on completion
+
+The moment the last tile slides into place, three things happen:
+
+1. The board **reveals the complete picture** — the empty cell fills in and
+   the gaps between tiles seal with a short fade, so the solved puzzle stays
+   fully visible (nothing covers it).
+2. The **result panel appears below the image** with the puzzle's answer and
+   an "Enter new password" button. The Restart button and the hint text are
+   hidden while the solved picture is on screen.
+3. All board input is **locked** until you leave the screen. Arrow keys fall
+   back to normal page scrolling so the result is easy to reach on small
+   screens.
 
 ### Change the puzzle size
 

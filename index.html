@@ -43,8 +43,25 @@
         <span class="moves-pill">Moves&nbsp;<b id="move-counter">0</b></span>
       </header>
       <div id="board" class="board" role="group" aria-label="Sliding puzzle board"></div>
+
+      <!-- Completion result: shown below the board, never covering it, so the
+           solved picture stays fully visible. At the same moment the board
+           reveals the complete image (the empty cell fills in). -->
+      <section id="result-panel" class="result-panel" role="status" hidden>
+        <div class="result-head">
+          <svg class="result-check" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+            <circle cx="10" cy="10" r="10" fill="currentColor" opacity="0.15" />
+            <path d="M6 10.3l2.7 2.7L14.2 7.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <p class="result-title">Puzzle solved!</p>
+        </div>
+        <p class="result-label">Answer</p>
+        <p id="result-answer" class="result-answer"></p>
+        <button id="result-back-btn" class="btn btn-primary" type="button">Enter new password</button>
+      </section>
+
       <button id="restart-btn" class="btn btn-secondary" type="button">Restart</button>
-      <p class="hint">Tap a tile next to the empty space to move it. Arrow keys work too.</p>
+      <p id="hint" class="hint">Tap a tile next to the empty space to move it. Arrow keys work too.</p>
     </section>
 
     <!-- Screen C: configuration error -->
@@ -55,15 +72,6 @@
     </section>
 
   </main>
-
-  <!-- Completion modal -->
-  <div id="modal" class="modal" hidden>
-    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-answer">
-      <p class="modal-message">Puzzle solved! Well done.</p>
-      <p id="modal-answer" class="modal-answer"></p>
-      <button id="modal-back-btn" class="btn btn-primary" type="button">Enter new password</button>
-    </div>
-  </div>
 
   <noscript><p class="noscript">This game needs JavaScript to run.</p></noscript>
 

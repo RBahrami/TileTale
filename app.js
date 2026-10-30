@@ -3,7 +3,8 @@
  *
  * Pure game logic lives in puzzle.js; all customization lives in config.js.
  * The app has three screens: password entry, game, and (on bad config) an
- * error screen — plus a completion modal shown when a puzzle is solved.
+ * error screen. When a puzzle is solved the board reveals the complete
+ * picture and the result is shown in a panel directly below it.
  */
 
 import { CONFIG, validateConfig } from "./config.js";
@@ -31,9 +32,10 @@ const board = $("board");
 const restartBtn = $("restart-btn");
 const backBtn = $("back-btn");
 
-const modal = $("modal");
-const modalAnswer = $("modal-answer");
-const modalBackBtn = $("modal-back-btn");
+const resultPanel = $("result-panel");
+const resultAnswer = $("result-answer");
+const resultBackBtn = $("result-back-btn");
+const hintEl = $("hint");
 
 // ---------------------------------------------------------------------------
 // Application state
@@ -47,7 +49,7 @@ const state = {
     cols: 0,        // board width  (number of columns)
     rows: 0,        // board height (number of rows)
     moves: 0,
-    finished: false // true once solved; blocks all input and shows the modal
+    finished: false // true once solved; blocks input, reveals the result panel
 };
 
 const tileElements = new Map(); // tile value -> element
@@ -60,7 +62,7 @@ function showScreen(name) {
     passwordScreen.hidden = name !== "password";
     gameScreen.hidden = name !== "game";
     errorScreen.hidden = name !== "error";
-    modal.hidden = true;
+    resultPanel.hidden = true;
 }
 
 function showMessage(el, text) {
@@ -144,6 +146,10 @@ function startRound() {
     );
     state.moves = 0;
     state.finished = false;
+    board.classList.remove("solved");
+    resultPanel.hidden = true;
+    restartBtn.hidden = false;
+    hintEl.hidden = false;
     buildBoard();
     updateMoveCounter();
 }
@@ -170,6 +176,16 @@ function buildBoard() {
         tileElements.set(value, tile);
         board.appendChild(tile);
     }
+
+    // Completion reveal: this layer fades in over the board the moment the
+    // puzzle is solved, filling the empty cell and sealing the gaps so the
+    // complete picture is displayed.
+    const reveal = document.createElement("div");
+    reveal.className = "board-reveal";
+    reveal.setAttribute("aria-hidden", "true");
+    reveal.style.backgroundImage = `url("${state.game.image}")`;
+    board.appendChild(reveal);
+
     renderTiles();
 }
 
@@ -253,6 +269,9 @@ document.addEventListener("keydown", (event) => {
     if (gameScreen.hidden || !state.board) {
         return;
     }
+    if (state.finished) {
+        return; // puzzle solved: leave the arrow keys to normal page scrolling
+    }
     const cols = state.cols;
     const rows = state.rows;
     const blank = state.board.indexOf(0);
@@ -285,17 +304,26 @@ restartBtn.addEventListener("click", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Completion modal
+// Completion: reveal the full picture, show the result below the board
 // ---------------------------------------------------------------------------
 
 function finishGame() {
     state.finished = true;
-    modalAnswer.textContent = state.game.answer;
-    modal.hidden = false;
-    modalBackBtn.focus();
+    // The empty cell fills in and the gaps seal (CSS transition), so the
+    // complete picture stays visible on the board. The result then appears
+    // as a panel below the image — never on top of it.
+    board.classList.add("solved");
+    restartBtn.hidden = true;
+    hintEl.hidden = true;
+    resultAnswer.textContent = state.game.answer;
+    resultPanel.hidden = false;
+    requestAnimationFrame(() => {
+        resultBackBtn.focus({ preventScroll: true });
+        resultPanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
 }
 
-modalBackBtn.addEventListener("click", backToPassword);
+resultBackBtn.addEventListener("click", backToPassword);
 
 // ---------------------------------------------------------------------------
 // Returning to the password screen
