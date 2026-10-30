@@ -1,0 +1,370 @@
+/* ==========================================================================
+   Sliding Puzzle — styles
+   Mobile-first, minimal, modern. All colors/sizes come from custom properties.
+   ========================================================================== */
+
+:root {
+  --bg: #f4f6fa;
+  --surface: #ffffff;
+  --text: #1b2434;
+  --muted: #64748b;
+  --accent: #4f46e5;
+  --accent-strong: #4338ca;
+  --accent-soft: rgba(79, 70, 229, 0.16);
+  --border: #e3e8ef;
+  --letterbox: #eef1f6;  /* tile background while the image loads */
+  --recessed: #dfe5ee;   /* the hole where the missing tile would be */
+  --danger: #d92d20;
+  --gap: 6px;            /* space between tiles (read by app.js)     */
+  --radius: 16px;
+  --tile-radius: 10px;
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.1);
+  --shadow-lg: 0 24px 48px rgba(16, 24, 40, 0.28);
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; }
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.app {
+  min-height: 100vh;
+  min-height: 100dvh;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.screen {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.screen[hidden] { display: none !important; }
+
+.app-title {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.app-subtitle {
+  margin: 0;
+  color: var(--muted);
+  font-size: 16px;
+}
+
+.app-subtitle code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1px 6px;
+}
+
+/* --------------------------------------------------------------------------
+   Password screen
+   -------------------------------------------------------------------------- */
+
+#password-form {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.password-input {
+  width: 100%;
+  padding: 14px 16px;
+  font: inherit;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.35em;
+  text-indent: 0.35em; /* optically recenters text that has letter-spacing */
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--text);
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.password-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+/* --------------------------------------------------------------------------
+   Buttons
+   -------------------------------------------------------------------------- */
+
+.btn {
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 12px 20px;
+  border: 1.5px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.08s ease;
+}
+
+.btn:active { transform: scale(0.97); }
+
+.btn:focus-visible {
+  outline: 3px solid var(--accent-soft);
+  outline-offset: 1px;
+  border-color: var(--accent);
+}
+
+.btn[disabled] { opacity: 0.6; cursor: default; }
+
+.btn-primary { background: var(--accent); color: #ffffff; }
+.btn-primary:hover { background: var(--accent-strong); }
+
+.btn-secondary {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+  box-shadow: var(--shadow-sm);
+}
+.btn-secondary:hover { border-color: #cbd5e1; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--muted);
+  padding: 8px 10px;
+  font-size: 15px;
+}
+.btn-ghost:hover { color: var(--text); }
+
+/* --------------------------------------------------------------------------
+   Messages
+   -------------------------------------------------------------------------- */
+
+.error {
+  margin: 0;
+  color: var(--danger);
+  font-size: 14px;
+  text-align: center;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.error:not([hidden]) { animation: shake 0.25s ease; }
+
+.error-box {
+  margin: 0;
+  padding: 14px 16px;
+  background: #fef3f2;
+  border: 1px solid #fecdca;
+  border-radius: 12px;
+  color: var(--danger);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  white-space: pre-wrap;
+  max-width: 440px;
+  overflow-wrap: anywhere;
+}
+
+.noscript {
+  padding: 24px;
+  text-align: center;
+  color: var(--danger);
+}
+
+/* --------------------------------------------------------------------------
+   Game screen
+   -------------------------------------------------------------------------- */
+
+.game-header {
+  width: 100%;
+  max-width: 460px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.game-id {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.moves-pill {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 14px;
+  color: var(--muted);
+  box-shadow: var(--shadow-sm);
+  white-space: nowrap;
+}
+
+.moves-pill b {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.board {
+  /* --cols/--rows are set from config via JS (also sets aspect-ratio inline);
+     --gap is the tile spacing (read by app.js) */
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  max-width: min(440px, max(240px, calc(100dvh - 250px)));
+  aspect-ratio: 4 / 3;
+  background: var(--recessed);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.tile {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols));
+  height: calc((100% - (var(--rows) - 1) * var(--gap)) / var(--rows));
+  border: none;
+  padding: 0;
+  margin: 0;
+  border-radius: var(--tile-radius);
+  background-color: var(--letterbox);
+  background-repeat: no-repeat;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.13s ease, filter 0.15s ease;
+}
+
+.tile:hover { filter: brightness(1.05); }
+
+.tile:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  z-index: 2;
+}
+
+.tile-num {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  min-width: 20px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #1f2937;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: center;
+  pointer-events: none;
+}
+
+.hint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* --------------------------------------------------------------------------
+   Completion modal
+   -------------------------------------------------------------------------- */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.55);
+  animation: fade-in 0.18s ease;
+}
+
+.modal[hidden] { display: none !important; }
+
+.modal-card {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 30px 24px;
+  background: var(--surface);
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+  animation: pop-in 0.18s ease;
+}
+
+.modal-message {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.modal-answer {
+  margin: 0;
+  font-size: clamp(24px, 7vw, 32px);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+@keyframes fade-in { from { opacity: 0; } }
+
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(0.94) translateY(6px); }
+}
+
+/* --------------------------------------------------------------------------
+   Accessibility & small screens
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 380px) {
+  .app-title { font-size: 26px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

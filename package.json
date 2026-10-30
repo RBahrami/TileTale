@@ -1,0 +1,10 @@
+{
+  "name": "sliding-puzzle",
+  "version": "1.0.0",
+  "description": "A small, self-contained sliding puzzle game for GitHub Pages.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node tests/puzzle.test.mjs"
+  }
+}
