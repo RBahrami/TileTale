@@ -171,3 +171,35 @@ export function shuffledBoard(cols, rows, moves, rng = Math.random) {
         // otherwise: discard and generate another one
     }
 }
+
+// ---------------------------------------------------------------------------
+// Undo history (player moves)
+// ---------------------------------------------------------------------------
+
+/** Maximum number of player moves that can be undone. */
+export const UNDO_LIMIT = 20;
+
+/**
+ * Append a snapshot of `board` to the undo history, keeping at most `limit`
+ * entries; when the limit is exceeded the OLDEST entry is discarded.
+ *
+ * The board is copied, so later moves can never mutate a stored snapshot.
+ * Neither `history` nor `board` is modified — a new array is returned.
+ * Only valid player moves should be recorded: shuffles, restarts, undos and
+ * invalid moves must not create history entries.
+ *
+ * @param {number[][]} history current history stack (oldest first)
+ * @param {number[]} board the board state immediately BEFORE the move
+ * @param {number} [limit] maximum number of stored states
+ * @returns {number[][]} the new history stack
+ */
+export function recordHistory(history, board, limit = UNDO_LIMIT) {
+    if (!Array.isArray(history)) {
+        throw new TypeError(`history must be an array (got ${typeof history})`);
+    }
+    if (!Array.isArray(board)) {
+        throw new TypeError(`board must be an array (got ${typeof board})`);
+    }
+    const next = [...history, [...board]];
+    return next.length > limit ? next.slice(next.length - limit) : next;
+}

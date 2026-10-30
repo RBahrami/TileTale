@@ -21,7 +21,7 @@ a result panel directly below the image.
 
 ```text
 /
-├── index.html          # markup for the three screens + result panel
+├── index.html          # markup for the three screens, controls and overlays
 ├── config.js           # ALL game customization lives here
 ├── puzzle.js           # pure game logic (shuffle, moves, solvability)
 ├── app.js              # UI layer (screens, input, rendering)
@@ -103,11 +103,40 @@ The moment the last tile slides into place, three things happen:
    the gaps between tiles seal with a short fade, so the solved puzzle stays
    fully visible (nothing covers it).
 2. The **result panel appears below the image** with the puzzle's answer and
-   an "Enter new password" button. The Restart button and the hint text are
-   hidden while the solved picture is on screen.
+   an "Enter new password" button. The control buttons (Undo, Restart, Hint)
+   and the hint text are hidden while the solved picture is on screen.
 3. All board input is **locked** until you leave the screen. Arrow keys fall
    back to normal page scrolling so the result is easy to reach on small
    screens.
+
+### Undo
+
+The **Undo** button sits next to Restart and restores the exact board state
+from before the last player move — including the empty-space position — and
+steps the move counter back. Up to **20 moves** are kept; pushing a 21st
+discards the oldest. The button is disabled whenever there is nothing to
+undo. Shuffling, restarting, starting another game, invalid taps and undo
+operations themselves never create history entries, and undoing can never
+produce an unsolvable board — every restored state is a state that was
+actually reached with legal moves.
+
+### Hint
+
+The **Hint** button opens a text-free visual guide to the standard human
+solving strategy for the 4×3 board, presented as four schematic stages:
+
+1. complete the **first row** — tiles 1–2 shown as done, tiles 3–4 grouped
+   as a pair,
+2. complete the **first remaining column** — tiles 5–9 as a vertical pair,
+3. complete the **second remaining column** — tiles 6–10 as a vertical pair,
+4. solve the **final bottom-right 2×2** — tiles 7, 8, 11 and the empty cell.
+
+Green tiles mark completed-and-locked sections, indigo tiles plus a ring
+mark the pair currently being placed, and the dashed cell is the empty
+space. Navigate with the arrow buttons, the dots, a swipe, or the keyboard
+arrow keys; close with the × icon, Escape or a tap on the backdrop. The
+guide is purely visual — it contains no instructions and never modifies the
+board, the move counter or the undo history.
 
 ### Change the puzzle size
 
@@ -154,6 +183,9 @@ file produces a clear error message when that particular game is started.
 - **Movement** — only orthogonally adjacent tiles move; diagonal and distant
   moves are rejected; every shuffled board can be replayed back to the solved
   state via inverse moves.
+- **Undo history** — capped at 20 entries with the oldest discarded first,
+  snapshot copies never mutated, and a 40-move random walk replayed backwards
+  restoring every exact state (all of them still solvable).
 - **Mixing** — shuffled boards are well mixed so real gameplay is required.
 - **Configuration** — the shipped config validates, and invalid configs
   (duplicate passwords/ids, bad sizes, missing fields, non-relative paths)

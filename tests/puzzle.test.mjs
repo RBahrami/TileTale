@@ -24,7 +24,9 @@ import {
   isSolvable,
   moveTile,
   neighborIndices,
+  recordHistory,
   shuffledBoard,
+  UNDO_LIMIT,
 } from "../puzzle.js";
 import { CONFIG, validateConfig } from "../config.js";
 
@@ -361,6 +363,69 @@ test("config validation rejects invalid configurations", () => {
   const digitsPassword = structuredClone(base);
   digitsPassword.games[0].password = "QJR0";
   assert.throws(() => validateConfig(digitsPassword), /password/);
+});
+
+test("recordHistory: caps at 20 entries and discards the oldest", () => {
+  let history = [];
+  const snapshots = [];
+  for (let i = 0; i < 25; i++) {
+    const board = Array.from({ length: 12 }, (_, k) => (k + i) % 12);
+    snapshots.push(board);
+    history = recordHistory(history, board);
+    assert.ok(history.length <= UNDO_LIMIT, `length ${history.length} after ${i + 1} pushes`);
+  }
+  assert.equal(UNDO_LIMIT, 20);
+  assert.equal(history.length, 20);
+  // the five oldest states were discarded; the newest 20 remain, in order
+  assert.deepEqual(history[0], snapshots[5]);
+  assert.deepEqual(history[1], snapshots[6]);
+  assert.deepEqual(history[19], snapshots[24]);
+});
+
+test("recordHistory: stores copies and never mutates its inputs", () => {
+  const history = [];
+  const board = [1, 2, 3, 0];
+  const next = recordHistory(history, board);
+  board[0] = 99;                            // later changes never leak in
+  assert.equal(next[0][0], 1);
+  next[0][1] = 42;                          // touching a snapshot is harmless…
+  assert.deepEqual(board, [99, 2, 3, 0]);   // …the live board is unaffected
+  assert.deepEqual(history, []);            // the input stack is untouched
+  assert.throws(() => recordHistory(null, [1, 0]), /history/);
+  assert.throws(() => recordHistory([], "nope"), /board/);
+});
+
+test("undo replay on 4x3: exact states, capped at 20, always solvable", () => {
+  let board = shuffledBoard(4, 3, CONFIG.shuffleMoves, mulberry32(424242));
+  let history = [];
+  const states = [[...board]]; // states[k] = board after k player moves
+  for (let i = 0; i < 40; i++) {
+    const blank = board.indexOf(0);
+    const options = neighborIndices(blank, 4, 3);
+    const pick = options[Math.floor(mulberry32(31000 + i)() * options.length)];
+    history = recordHistory(history, board); // saved BEFORE the move, like app.js
+    board = moveTile(board, 4, 3, pick);
+    assert.ok(board, "step must be a legal move");
+    states.push([...board]);
+  }
+  assert.equal(history.length, UNDO_LIMIT);
+  assert.deepEqual(history[0], states[40 - UNDO_LIMIT]); // oldest kept snapshot
+
+  // undo everything the stack allows; every pop must restore the exact
+  // previous state and never produce an unsolvable board
+  let moveCount = 40;
+  while (history.length > 0) {
+    const restored = history.pop();
+    moveCount -= 1;
+    assert.deepEqual(restored, states[moveCount]);
+    assert.equal(restored.filter((v) => v === 0).length, 1, "one empty space");
+    assert.deepEqual(
+      restored.filter((v) => v !== 0).sort((a, b) => a - b),
+      [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    );
+    assert.ok(isSolvable(restored, 4), "undo must never yield an unsolvable board");
+  }
+  assert.equal(moveCount, 20, "exactly 20 undos must be available");
 });
 
 /** expected validateConfig() shape for a square shorthand config */

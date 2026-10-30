@@ -60,7 +60,11 @@
         <button id="result-back-btn" class="btn btn-primary" type="button">Enter new password</button>
       </section>
 
-      <button id="restart-btn" class="btn btn-secondary" type="button">Restart</button>
+      <div id="controls" class="controls">
+        <button id="undo-btn" class="btn btn-secondary" type="button" disabled>Undo</button>
+        <button id="restart-btn" class="btn btn-secondary" type="button">Restart</button>
+        <button id="hint-btn" class="btn btn-secondary" type="button">Hint</button>
+      </div>
       <p id="hint" class="hint">Tap a tile next to the empty space to move it. Arrow keys work too.</p>
     </section>
 
@@ -72,6 +76,34 @@
     </section>
 
   </main>
+
+  <!-- Visual solving-strategy guide: four schematic stages, no text by design.
+       Purely presentational — it never modifies the game state. -->
+  <div id="hint-modal" class="hint-modal" hidden>
+    <div class="hint-card" role="dialog" aria-modal="true" aria-label="Solving strategy guide">
+      <button id="hint-close" class="hint-close" type="button" aria-label="Close">
+        <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+          <path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+        </svg>
+      </button>
+      <div id="hint-viewport" class="hint-viewport">
+        <div id="hint-track" class="hint-track"></div>
+      </div>
+      <div class="hint-nav">
+        <button id="hint-prev" class="hint-arrow" type="button" aria-label="Previous stage" disabled>
+          <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+            <path d="M12.5 4.5L7 10l5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        <div id="hint-dots" class="hint-dots"></div>
+        <button id="hint-next" class="hint-arrow" type="button" aria-label="Next stage">
+          <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+            <path d="M7.5 4.5L13 10l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <noscript><p class="noscript">This game needs JavaScript to run.</p></noscript>
 

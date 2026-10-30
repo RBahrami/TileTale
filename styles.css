@@ -300,6 +300,27 @@ body {
 }
 
 /* --------------------------------------------------------------------------
+   Game controls (Undo / Restart / Hint)
+   -------------------------------------------------------------------------- */
+
+.controls {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  max-width: 440px;
+}
+
+.controls[hidden] { display: none !important; }
+
+/* three equal, thumb-friendly buttons */
+.controls .btn {
+  flex: 1;
+  min-height: 48px;
+  padding: 10px 12px;
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
    Completion: solved-picture reveal + result panel
    -------------------------------------------------------------------------- */
 
@@ -382,8 +403,197 @@ body {
   margin-top: 16px;
 }
 
+@keyframes fade-in { from { opacity: 0; } }
+
 @keyframes pop-in {
   from { opacity: 0; transform: scale(0.94) translateY(6px); }
+}
+
+/* --------------------------------------------------------------------------
+   Hint overlay — text-free visual solving guide (four schematic stages)
+   -------------------------------------------------------------------------- */
+
+.hint-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.55);
+  animation: fade-in 0.18s ease;
+}
+
+.hint-modal[hidden] { display: none !important; }
+
+.hint-card {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px 18px 16px;
+  background: var(--surface);
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+  animation: pop-in 0.18s ease;
+}
+
+.hint-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 5; /* the transformed carousel track paints at z-index 0 — stay above it */
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+}
+
+.hint-close:hover { background: var(--accent-soft); color: var(--text); }
+
+.hint-close svg { width: 18px; height: 18px; }
+
+.hint-viewport {
+  overflow: hidden;
+  touch-action: pan-y;   /* horizontal swipes navigate, vertical scrolls */
+  border-radius: 12px;
+}
+
+.hint-track {
+  display: flex;
+  transition: transform 0.3s ease;
+}
+
+.h-stage {
+  flex: 0 0 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 2px;
+}
+
+/* Schematic 4x3 board — same proportions, gaps and radii as the real board */
+.h-board {
+  width: min(100%, 320px);
+  aspect-ratio: 4 / 3;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: var(--gap);
+  padding: 9px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.h-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--tile-radius);
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  color: var(--muted);
+  font-weight: 700;
+  font-size: clamp(15px, 4.5vw, 20px);
+  font-variant-numeric: tabular-nums;
+}
+
+/* completed sections — locked (consistent treatment in every stage) */
+.h-tile.h-done {
+  background: rgba(18, 128, 92, 0.13);
+  border-color: rgba(18, 128, 92, 0.55);
+  color: var(--success);
+}
+
+/* the pair currently being placed */
+.h-tile.h-group {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
+
+/* the empty cell — visually distinct in every stage */
+.h-empty {
+  border-radius: var(--tile-radius);
+  background: var(--recessed);
+  border: 1.5px dashed #b6c0cf;
+  box-shadow: inset 0 2px 5px rgba(16, 24, 40, 0.1);
+}
+
+/* rings that group tiles together or mark a whole section */
+.h-ring {
+  pointer-events: none;
+  z-index: 2;
+  border-radius: 14px;
+  margin: -5px;
+}
+
+.h-ring-group {
+  border: 3px solid var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+.h-ring-section {
+  border: 2.5px solid var(--success);
+  box-shadow: 0 0 0 4px rgba(18, 128, 92, 0.12);
+}
+
+.hint-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.hint-arrow {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.hint-arrow svg { width: 20px; height: 20px; }
+
+.hint-arrow[disabled] { opacity: 0.35; cursor: default; }
+
+.hint-dots {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hint-dot {
+  width: 9px;
+  height: 9px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: #cbd5e1;
+  cursor: pointer;
+  transition: background-color 0.2s ease, width 0.2s ease;
+}
+
+.hint-dot.active {
+  width: 22px;
+  background: var(--accent);
 }
 
 /* --------------------------------------------------------------------------
